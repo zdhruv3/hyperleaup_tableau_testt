@@ -273,6 +273,8 @@ def write_parquet_to_dbfs(df: DataFrame, name: str, allow_nulls = False, convert
         filename = os.path.basename(dbfs_path)
         return filename
 
+    dbfs_parquet_file_path = parquet_file
+
     parquet_file = extract_filename(parquet_file)
     if parquet_file is None:
         raise FileNotFoundError(f"Parquet file '{tmp_dir}' not found on DBFS.")
@@ -282,6 +284,7 @@ def write_parquet_to_dbfs(df: DataFrame, name: str, allow_nulls = False, convert
         os.makedirs(tmp_dir)
 
     src_path = dbfs_tmp_dir + parquet_file
+    dbutils.fs.cp(dbfs_parquet_file_path, src_path)
     dest_path = tmp_dir + parquet_file
     copyfile(src_path, dest_path)
 
