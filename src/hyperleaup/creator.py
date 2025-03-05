@@ -11,6 +11,7 @@ from tableauhyperapi import SqlType, TableDefinition, NULLABLE, NOT_NULLABLE, Ta
     Inserter, Connection, CreateMode
 from pathlib import Path
 from databricks.sdk.runtime import *
+import time
 
 def clean_dataframe(df: DataFrame, allow_nulls=False, convert_decimal_precision=False) -> DataFrame:
     """Replaces null or NaN values with '' and 0s"""
@@ -248,8 +249,14 @@ def write_parquet_to_dbfs(df: DataFrame, name: str, allow_nulls = False, convert
     cleaned_df = clean_dataframe(df, allow_nulls, convert_decimal_precision) 
     
     # write the DataFrame to DBFS as a single Parquet file
-    cleaned_df.coalesce(1).write \
-        .mode("overwrite").parquet(tmp_dir)
+    cleaned_df.coalesce(1).write.mode("overwrite").parquet(tmp_dir)
+    time.sleep(5)
+    dbfs_tmp_dir = "/dbfs" + tmp_dir
+    files = dbutils.fs.ls(tmp_dir)
+    print(files)
+    print(dbfs_tmp_dir)
+    if files is None:
+      logging.info(f"Parquet path '{tmp_dir}' not found on DBFS.")
 
     dbfs_tmp_dir = "/dbfs" + tmp_dir
     parquet_file = None
@@ -259,12 +266,6 @@ def write_parquet_to_dbfs(df: DataFrame, name: str, allow_nulls = False, convert
                 parquet_file = file
 
 
-    dbfs_tmp_dir = "/dbfs" + tmp_dir
-    files = dbutils.fs.ls(tmp_dir)
-    print(files)
-    print(dbfs_tmp_dir)
-    if files is None:
-      logging.info(f"Parquet path '{tmp_dir}' not found on DBFS.")
 
     if parquet_file is None:
         raise FileNotFoundError(f"Parquet file '{tmp_dir}' not found on DBFS.")
