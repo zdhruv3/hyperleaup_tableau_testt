@@ -285,10 +285,12 @@ def write_parquet_to_dbfs(df: DataFrame, name: str, allow_nulls = False, convert
 
     src_path = dbfs_tmp_dir + parquet_file
     dbutils.fs.cp(dbfs_parquet_file_path, src_path)
+    dest_path = tmp_dir + parquet_file
     logging.info(f"Parquet file copied to: {src_path}")
     print(f"Parquet file copied to: {src_path}")
-    dest_path = tmp_dir + parquet_file
-    copyfile(src_path, dest_path)
+    dbutils.fs.cp(dbfs_parquet_file_path, dest_path)
+    logging.info(f"Parquet file copied to: {dest_path}")
+    # copyfile(src_path, dest_path)
 
     return dest_path
 
