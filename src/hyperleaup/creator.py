@@ -276,7 +276,7 @@ def write_parquet_to_dbfs(df: DataFrame, name: str, allow_nulls = False, convert
     if not os.path.exists(tmp_dir):
         os.makedirs(tmp_dir)
 
-    src_path = dbfs_tmp_dir + parquet_file
+    src_path = parquet_file
     dest_path = tmp_dir + parquet_file
     copyfile(src_path, dest_path)
 
