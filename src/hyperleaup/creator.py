@@ -258,6 +258,12 @@ def write_parquet_to_dbfs(df: DataFrame, name: str, allow_nulls = False, convert
             if file.endswith(".parquet"):
                 parquet_file = file
 
+
+    dbfs_tmp_dir = "/dbfs" + tmp_dir
+    files = dbutils.fs.ls(tmp_dir)
+    if files is None:
+      logging.info(f"Parquet path '{tmp_dir}' not found on DBFS.")
+
     if parquet_file is None:
         raise FileNotFoundError(f"Parquet file '{tmp_dir}' not found on DBFS.")
 
