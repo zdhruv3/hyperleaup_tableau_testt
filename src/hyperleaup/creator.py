@@ -246,8 +246,7 @@ def write_parquet_to_dbfs(df: DataFrame, name: str, allow_nulls = False, convert
     """Writes and moves a single Parquet file written to a Databricks Filesystem to a temp directory on the driver node."""
     tmp_dir = f"/tmp/hyperleaup/{name}/"
 
-    cleaned_df = clean_dataframe(df, allow_nulls, convert_decimal_precision) 
-    
+    cleaned_df = clean_dataframe(df, allow_nulls, convert_decimal_precision)
     # write the DataFrame to DBFS as a single Parquet file
     cleaned_df.coalesce(1).write.mode("overwrite").parquet(tmp_dir)
     time.sleep(5)
@@ -269,6 +268,12 @@ def write_parquet_to_dbfs(df: DataFrame, name: str, allow_nulls = False, convert
             print(f"Found parquet file: {parquet_file}")
             break  # Stop after finding the first .parquet file
 
+    def extract_filename(dbfs_path):
+        # Extract the filename using os.path.basename
+        filename = os.path.basename(dbfs_path)
+        return filename
+
+    parquet_file = extract_filename(parquet_file)
     if parquet_file is None:
         raise FileNotFoundError(f"Parquet file '{tmp_dir}' not found on DBFS.")
 
@@ -276,7 +281,7 @@ def write_parquet_to_dbfs(df: DataFrame, name: str, allow_nulls = False, convert
     if not os.path.exists(tmp_dir):
         os.makedirs(tmp_dir)
 
-    src_path = parquet_file
+    src_path = dbfs_tmp_dir + parquet_file
     dest_path = tmp_dir + parquet_file
     copyfile(src_path, dest_path)
 
