@@ -283,14 +283,12 @@ def write_parquet_to_dbfs(df: DataFrame, name: str, allow_nulls = False, convert
     if not os.path.exists(tmp_dir):
         os.makedirs(tmp_dir)
 
+    logging.info(f"Copying Parquet file from DBFS to local disk...")
     src_path = dbfs_tmp_dir + parquet_file
-    dbutils.fs.cp(dbfs_parquet_file_path, src_path)
     dest_path = tmp_dir + parquet_file
-    logging.info(f"Parquet file copied to: {src_path}")
-    print(f"Parquet file copied to: {src_path}")
-    dbutils.fs.cp(dbfs_parquet_file_path, dest_path)
-    logging.info(f"Parquet file copied to: {dest_path}")
-    # copyfile(src_path, dest_path)
+    logging.info(f"Source path is {src_path}")
+    logging.info(f"Dest path is {dest_path}")
+    copyfile(src_path, dest_path)
 
     return dest_path
 
